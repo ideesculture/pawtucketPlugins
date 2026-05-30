@@ -1,0 +1,6 @@
+@import "https://cdn.jsdelivr.net/npm/@telophase/bulma-horizontal-card/css/bulma-horizontal-card.css";
+
+.content p{
+    margin-bottom: inherit !important;
+    font-size:12px;
+}

@@ -1,0 +1,95 @@
+
+.simple-image {
+    padding: 20px 0;
+    text-align:center;
+}
+.simple-image div {
+    text-align:initial;
+}
+
+.simple-image input,
+.simple-image [contenteditable] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e4e4e4;
+    background: #fff;
+    box-sizing: border-box;
+    border-radius: 3px;
+    outline: none;
+    font-size: 14px;
+}
+
+.simple-image img {
+    max-width: 100%;
+    margin-bottom: 15px;
+}
+
+.simple-image.withBorder img {
+    border: 1px solid #e8e8eb;
+}
+
+.simple-image.withBackground {
+    background: #eff2f5;
+    padding: 10px;
+}
+
+.simple-image.withBackground img {
+    display: block;
+    max-width: 60%;
+    margin: 0 auto 15px;
+}
+.simple-image.floatRight,
+.simple-image.floatLeft {
+    padding-top:10px;
+}
+.ce-block__content.floatRight {
+    float:right;
+    width:25%;
+    margin-right:25%;
+    margin-left:10px;
+    z-index:50;
+}
+.ce-block__content.floatLeft {
+    float:left;
+    width:25%;
+    margin-left:25%;
+    margin-right:10px;
+    z-index:50;
+}
+@media (max-width: 1407px) {
+    .ce-block__content.floatLeft {
+        margin-left:20%;
+    }
+}
+@media (max-width: 1215px) {
+    .ce-block__content.floatLeft {
+        margin-left:15%;
+    }
+}
+@media (max-width: 970px) {
+    .ce-block__content.floatLeft {
+        margin-left:15%;
+    }
+}
+
+@media (max-width: 884px) {
+    .ce-block__content.floatLeft {
+        margin-left:10%;
+    }
+}
+@media (max-width: 800px) {
+    .ce-block__content.floatLeft {
+        margin-left:5%;
+    }
+}
+@media (max-width: 650px) {
+    .ce-block__content.floatLeft {
+        float:none;
+        width:100%;
+        height:auto;
+        margin:auto;
+    }
+}
+.ce-toolbar.ce-toolbar--opened {
+    z-index: 100;
+}
