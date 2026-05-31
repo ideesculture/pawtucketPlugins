@@ -136,17 +136,20 @@ if (!function_exists('articles_editorjs_tool_enabled')) {
     }
 }
 
-if (!function_exists('articles_ca_object_conf')) {
+if (!function_exists('articles_ca_card_conf')) {
     /**
-     * Gabarit d'affichage du bloc CA Object, lu depuis conf/articles.conf et
+     * Gabarit d'affichage d'une carte CA, lu depuis conf/articles.conf et
      * surchargé par conf/local/articles.conf (surcharge par clé entière).
-     * Les codes de champs varient selon l'instance CollectiveAccess.
+     * Lit les clés <prefix>_title_template / <prefix>_image_template /
+     * <prefix>_field_templates. Les codes varient selon l'instance.
      *
+     * @param string $ps_prefix        ex. "ca_object", "ca_occurrence", "ca_set"
+     * @param string $ps_default_title template de titre par défaut si non configuré
      * @return array { title: string, image: string, fields: string[] }
      */
-    function articles_ca_object_conf() {
-        static $conf = null;
-        if ($conf !== null) { return $conf; }
+    function articles_ca_card_conf($ps_prefix, $ps_default_title) {
+        static $cache = [];
+        if (isset($cache[$ps_prefix])) { return $cache[$ps_prefix]; }
 
         $vs_dir = __CA_APP_DIR__ . '/plugins/Articles/conf';
         $o_default = Configuration::load($vs_dir . '/articles.conf');
@@ -161,16 +164,16 @@ if (!function_exists('articles_ca_object_conf')) {
             return $is_list ? $o_default->getList($key) : $o_default->get($key);
         };
 
-        $title = trim((string)$get('ca_object_title_template'));
-        $image = trim((string)$get('ca_object_image_template'));
-        $fields = $get('ca_object_field_templates', true);
+        $title = trim((string)$get($ps_prefix . '_title_template'));
+        $image = trim((string)$get($ps_prefix . '_image_template'));
+        $fields = $get($ps_prefix . '_field_templates', true);
 
-        $conf = [
-            'title'  => $title !== '' ? $title : '^ca_objects.preferred_labels',
+        $cache[$ps_prefix] = [
+            'title'  => $title !== '' ? $title : $ps_default_title,
             'image'  => $image,
             'fields' => is_array($fields) ? $fields : [],
         ];
-        return $conf;
+        return $cache[$ps_prefix];
     }
 }
 
@@ -197,22 +200,22 @@ if (!function_exists('articles_load_ca_instance')) {
     }
 }
 
-if (!function_exists('articles_render_ca_object')) {
+if (!function_exists('articles_render_ca_card')) {
     /**
-     * Rend la carte enrichie d'un ca_objects selon le gabarit configuré
-     * (image à gauche, preferred_labels en gras, puis les champs configurés).
+     * Rend une carte CA générique selon un gabarit (image à gauche,
+     * preferred_labels en gras, puis les champs configurés, et un CTA optionnel).
      *
-     * @param object $pt_object instance ca_objects chargée
+     * @param object $pt           instance du modèle CA chargée
+     * @param array  $pa_conf      gabarit (cf. articles_ca_card_conf)
+     * @param string $ps_detail    clé Detail (ex. "objects") pour le CTA, ou "" pour aucun
      * @return string HTML
      */
-    function articles_render_ca_object($pt_object) {
-        $c = articles_ca_object_conf();
-
-        $title = trim($pt_object->getWithTemplate($c['title']));
+    function articles_render_ca_card($pt, $pa_conf, $ps_detail = '') {
+        $title = $pa_conf['title'] !== '' ? trim($pt->getWithTemplate($pa_conf['title'])) : '';
 
         $img = '';
-        if ($c['image'] !== '') {
-            $url = trim($pt_object->getWithTemplate($c['image']));
+        if ($pa_conf['image'] !== '') {
+            $url = trim($pt->getWithTemplate($pa_conf['image']));
             // Normalisation : certaines instances injectent le chemin filesystem
             // dans l'URL média -> on ne garde que la partie web à partir de /media/.
             $pos = strpos($url, '/media/');
@@ -223,10 +226,10 @@ if (!function_exists('articles_render_ca_object')) {
         }
 
         $lines = '';
-        foreach ($c['fields'] as $tpl) {
+        foreach ($pa_conf['fields'] as $tpl) {
             $tpl = trim($tpl);
             if ($tpl === '') { continue; }
-            $v = trim($pt_object->getWithTemplate($tpl));
+            $v = trim($pt->getWithTemplate($tpl));
             if ($v === '') { continue; }
             // Classe = code du champ (1ère référence ^ca_<table>.<code> du template)
             $cls = '';
@@ -234,11 +237,21 @@ if (!function_exists('articles_render_ca_object')) {
             $lines .= '<p' . ($cls !== '' ? ' class="' . $cls . '"' : '') . '>' . $v . '</p>';
         }
 
-        $html  = '<div class="ca-object-card">';
+        // CTA « En savoir plus » vers la fiche (clé primaire, même si saisie par idno)
+        $cta = '';
+        if ($ps_detail !== '') {
+            $pk = (int)$pt->getPrimaryKey();
+            $cta = '<p class="ca-object-card__cta"><a class="button is-primary" href="/index.php/Detail/'
+                . $ps_detail . '/' . $pk . '">En savoir plus</a></p>';
+        }
+
+        $modifier = ($img === '') ? ' ca-object-card--simple' : '';
+        $html  = '<div class="ca-object-card' . $modifier . '">';
         if ($img !== '') { $html .= '<div class="ca-object-card__image">' . $img . '</div>'; }
         $html .= '<div class="ca-object-card__body">';
         $html .= '<div class="ca-object-card__title">' . $title . '</div>';
         $html .= $lines;
+        $html .= $cta;
         $html .= '</div></div>';
         return $html;
     }
@@ -246,7 +259,8 @@ if (!function_exists('articles_render_ca_object')) {
 
 if (!function_exists('articles_render_ca_entity')) {
     /**
-     * Rend le HTML d'un bloc CA (objet enrichi ; occurrence/set = libellé).
+     * Rend le HTML d'un bloc CA. Le gabarit de chaque type est configurable
+     * (clés ca_object_*, ca_occurrence_*, ca_set_* dans articles.conf).
      * Utilisé à la fois par l'aperçu AJAX (éditeur) et le rendu public.
      *
      * @param string $ps_type objects | occurrences | sets
@@ -254,16 +268,19 @@ if (!function_exists('articles_render_ca_entity')) {
      * @return string HTML (vide si introuvable)
      */
     function articles_render_ca_entity($ps_type, $pm_id) {
-        $va_map = ['objects' => 'ca_objects', 'occurrences' => 'ca_occurrences', 'sets' => 'ca_sets'];
+        // type => [ table, préfixe conf, titre par défaut, clé Detail (CTA) ]
+        $va_map = [
+            'objects'     => ['ca_objects',     'ca_object',     '^ca_objects.preferred_labels',     'objects'],
+            'occurrences' => ['ca_occurrences', 'ca_occurrence', '^ca_occurrences.preferred_labels', 'occurrences'],
+            'sets'        => ['ca_sets',        'ca_set',        '^ca_sets.preferred_labels',        ''],
+        ];
         if (!isset($va_map[$ps_type])) { return ''; }
+        list($vs_table, $vs_prefix, $vs_default_title, $vs_detail) = $va_map[$ps_type];
 
-        $t = articles_load_ca_instance($va_map[$ps_type], $pm_id);
+        $t = articles_load_ca_instance($vs_table, $pm_id);
         if (!$t) { return ''; }
 
-        if ($ps_type === 'objects') { return articles_render_ca_object($t); }
-
-        $tpl = ($ps_type === 'occurrences') ? '^ca_occurrences.preferred_labels' : '^ca_sets.preferred_labels';
-        return '<div class="ca-object-card ca-object-card--simple"><div class="ca-object-card__body">'
-            . '<div class="ca-object-card__title">' . $t->getWithTemplate($tpl) . '</div></div></div>';
+        $conf = articles_ca_card_conf($vs_prefix, $vs_default_title);
+        return articles_render_ca_card($t, $conf, $vs_detail);
     }
 }

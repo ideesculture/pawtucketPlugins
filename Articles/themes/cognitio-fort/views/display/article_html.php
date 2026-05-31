@@ -975,10 +975,26 @@ if (count($va_other_expos) > 0):
 }
 
 .simple-image.stretched {
-	margin-top:60px;
-	margin-bottom:60px;
-	margin-left:calc((100vw - 1360px)/2 * -1);
-	margin-right:calc((100vw - 1360px)/2 * -1);
+	/* "Sort" du conteneur (max 1200px) : largeur = min(100vw, 1420px), recentrée
+	   sur l'écran via margin-left:50% + translateX(-50%), indépendamment de la
+	   largeur du parent. */
+	width: 100vw;
+	max-width: 1420px;
+	margin-left: 50%;
+	transform: translateX(-50%);
+	margin-top: 60px;
+	margin-bottom: 60px;
+}
+.simple-image.stretched img {
+	width: 100%;
+}
+/* Sécurise le débord horizontal lié à 100vw (largeur de la scrollbar) : on clippe
+   au niveau du wrapper plein-largeur, sans rogner l'image ni casser sticky. */
+.article-phoi,
+.exposition-phoi,
+.playlist-phoi,
+.podcast-phoi {
+	overflow-x: clip;
 }
 
 .h2-number {
@@ -1073,5 +1089,29 @@ if (count($va_other_expos) > 0):
 }
 .ca-entity .ca-object-card__body p {
 	margin: 2px 0;
+}
+.ca-entity .ca-object-card__cta {
+	margin-top: 12px;
+}
+
+/* Bloc colonnes (editorjs-columns) : Bulma .columns ne passe pas en flex par
+   défaut sur cette base -> on force la mise en page ici. Les largeurs (flex)
+   sont posées en inline par type selon le ratio. */
+.editorjs-columns {
+	display: flex;
+	gap: 20px;
+	align-items: flex-start;
+}
+.editorjs-columns > .column {
+	flex: 1 1 0;
+	min-width: 0;
+}
+@media screen and (max-width: 768px) {
+	.editorjs-columns {
+		flex-wrap: wrap;
+	}
+	.editorjs-columns > .column {
+		flex-basis: 100% !important;
+	}
 }
 </style>

@@ -69,6 +69,6 @@
 .ca-object-card__body p {
     margin: 2px 0;
 }
-.ca-object-card--simple {
-    border-style: dashed;
+.ca-object-card__cta {
+    margin-top: 12px !important;
 }

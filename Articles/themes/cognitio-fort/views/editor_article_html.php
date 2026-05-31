@@ -668,5 +668,11 @@ button.is-big.is-primary {
 	border-radius: 4px;
 	padding: 0 10px;
 }
+/* Dans les éditeurs imbriqués des colonnes : annule le margin-right:50px du mode
+   "narrow" et le padding-bottom:100px d'Editor.js (sinon contenu décalé/espacé). */
+.ce-column .codex-editor__redactor {
+	margin-right: 0;
+	padding-bottom: 0 !important;
+}
     </style>
 <?php //die();

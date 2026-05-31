@@ -227,10 +227,21 @@ Menu contextuel = Move up / Delete / Move down (cœur Editor.js) + bouton **Edit
   Données sauvegardées : `{ id }` seulement (le rendu est recalculé côté serveur).
 - **ID accepté** : clé primaire **ou** identifiant (`idno`, ou `set_code` pour
   les sets) — résolu par `articles_load_ca_instance()`.
-- **Rendu centralisé** (`lib/articles_functions.php`) :
+- **Rendu centralisé & générique** (`lib/articles_functions.php`) :
   `articles_render_ca_entity($type, $id)` → utilisé À LA FOIS par l'aperçu AJAX
-  (éditeur) et le rendu public, pour un affichage identique. Objet =
-  `articles_render_ca_object()` (carte enrichie) ; occurrence/set = libellé.
+  (éditeur) et le rendu public, pour un affichage identique. Il dispatche vers
+  `articles_render_ca_card($t, $conf, $detailKey)` (rendu commun : image à
+  gauche, titre en gras, champs, CTA), le gabarit `$conf` venant de
+  `articles_ca_card_conf($prefix, $defaultTitle)`. Chaque type a son préfixe de
+  config : `ca_object`, `ca_occurrence`, `ca_set`. La carte reçoit le modificateur
+  `--simple` quand il n'y a pas d'image.
+- **CTA « En savoir plus »** : bouton en bas de carte vers la fiche Pawtucket,
+  construit avec la **clé primaire** (donc correct même si saisie par idno) :
+  - objet → `/index.php/Detail/objects/<pk>`
+  - occurrence → `/index.php/Detail/occurrences/<pk>`
+  - set → **aucun CTA**.
+  Markup `<p class="ca-object-card__cta"><a class="button is-primary">…</a></p>`
+  (espacement défini dans `ca-entity.css` + le `<style>` de `display/article_html.php`).
 - **Endpoint AJAX** : `DisplayController::CALabel()` —
   `/index.php/Articles/Display/CALabel/table/<objects|occurrences|sets>/id/<id>`
   → JSON `{ table, id, html }`.
@@ -240,27 +251,31 @@ Menu contextuel = Move up / Delete / Move down (cœur Editor.js) + bouton **Edit
 - **Rendu public** : `display/article_html.php`, cases `caObject` /
   `caOccurrence` / `caSet` groupés → `articles_render_ca_entity(...)`.
 
-### Gabarit « CA Object » (paramétrable — `conf/articles.conf`)
+### Gabarit des cartes (paramétrable — `conf/articles.conf`)
 
-Les codes de champs varient selon l'instance CollectiveAccess :
-- `ca_object_title_template` — titre en gras (déf. `^ca_objects.preferred_labels`)
-- `ca_object_image_template` — image à gauche (déf.
+Trois jeux de clés (même schéma), `<prefix>` ∈ `ca_object` / `ca_occurrence` /
+`ca_set`. Les codes varient selon l'instance CollectiveAccess :
+- `<prefix>_title_template` — titre en gras (déf. `^ca_<table>.preferred_labels`)
+- `<prefix>_image_template` — image à gauche (déf. objet & occurrence :
   `^ca_object_representations.media.preview170.url`). L'URL est **normalisée**
   (on ne garde que la partie à partir de `/media/`) car certaines instances
   injectent le chemin filesystem dans l'URL média.
-- `ca_object_field_templates` — **liste** de templates `getWithTemplate` rendus
-  en lignes (valeurs vides ignorées ; pas de virgule dans un template). Carte
-  bordée `#e3dcd2` (classe `.ca-object-card`, CSS dans `ca-entity.css` ET dans
-  le `<style>` de `display/article_html.php`).
+- `<prefix>_field_templates` — **liste** de templates `getWithTemplate` rendus
+  en lignes (valeurs vides ignorées ; pas de virgule dans un template).
 
-  Chaque ligne est un `<p>` portant une **classe = code du champ**, dérivée de la
-  1ʳᵉ référence `^ca_<table>.<code>` du template (ex. `^ca_objects.idno` →
-  `<p class="idno">…</p>`). Permet de cibler chaque champ en CSS
-  (`.ca-object-card .mission_interet_strategique { … }`). Un template sans
-  référence de champ (texte libre) produit un `<p>` sans classe.
+Exemples fournis : objet (type_id, idno, campagnes_construction,
+mission_interet_strategique) ; occurrence (type_id). Le set n'a pas de gabarit
+configuré → titre seul. CSS de la carte (`.ca-object-card`) dans `ca-entity.css`
+ET dans le `<style>` de `display/article_html.php`.
 
-Occurrence/Set n'affichent que le `preferred_labels` (enrichissables sur le même
-modèle si besoin).
+Chaque ligne de champ est un `<p>` portant une **classe = code du champ**,
+dérivée de la 1ʳᵉ référence `^ca_<table>.<code>` du template (ex.
+`^ca_objects.idno` → `<p class="idno">…</p>`). Permet de cibler chaque champ en
+CSS (`.ca-object-card .mission_interet_strategique { … }`). Un template sans
+référence de champ (texte libre) produit un `<p>` sans classe.
+
+Pour enrichir un type, il suffit d'ajouter/d'éditer ses clés `<prefix>_*` dans
+`conf/articles.conf` (ou `conf/local/articles.conf`) — aucun code à toucher.
 
 ## Conventions URLs/thème (rappel)
 

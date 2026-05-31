@@ -1,0 +1,7 @@
+# Configuration locale par instance — ne pas committer.
+# Le modèle versionné est conf/local/articles.conf.example
+conf/local/articles.conf
+
+# Snapshots de versions d'articles (générés à l'exécution) — ne pas committer.
+backup/*
+!backup/.gitkeep
