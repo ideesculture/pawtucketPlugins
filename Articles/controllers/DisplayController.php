@@ -203,6 +203,7 @@ class DisplayController extends ActionController
         foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
             if($group["code"] == "redactor") $is_redactor=true;
         }
+        if(!$is_redactor) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -218,6 +219,7 @@ class DisplayController extends ActionController
         foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
             if($group["code"] == "redactor") $is_redactor=true;
         }
+        if(!$is_redactor) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -309,6 +311,25 @@ class DisplayController extends ActionController
         $this->view->setVar("id", $id);
 
         print $this->render('display/set_html.php', false);
+        exit();
+    }
+
+    /**
+     * AJAX endpoint : renvoie le preferred_labels d'une entité CollectiveAccess
+     * (ca_objects / ca_occurrences / ca_sets) au format JSON.
+     * Utilisé par les blocs Editor.js CA Object / CA Occurrence / CA Object set.
+     * URL : /index.php/Articles/Display/CALabel/table/<objects|occurrences|sets>/id/<id>
+     */
+    public function CALabel() {
+        require_once(__CA_APP_DIR__.'/plugins/Articles/lib/articles_functions.php');
+        $table = $this->request->getParameter("table", pString);
+        // pString : l'ID peut être une clé primaire OU un idno / set_code
+        $id = $this->request->getParameter("id", pString);
+
+        $html = articles_render_ca_entity($table, $id);
+
+        header("Content-Type: application/json; charset=utf-8");
+        print json_encode(["table" => $table, "id" => $id, "html" => $html]);
         exit();
     }
 }

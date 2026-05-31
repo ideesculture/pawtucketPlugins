@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL); 
 
-require "/var/www/phoi/collectiveaccess/pawtucket2/setup.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/setup.php";
 require __CA_MODELS_DIR__ . "/ca_objects.php";
 
 $q = $_GET["id"];
@@ -22,7 +22,7 @@ $albumName = str_replace("
 <link rel="stylesheet" href="/assets/jquery/circular-slider/circular-slider.css" type="text/css" media="all">
 <script src="/assets/jquery/js/threesixty.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="/assets/fontawesome/css/font-awesome.min.css" type="text/css" media="all">
-<link rel="stylesheet" href="/themes/phoi/assets/pawtucket/css/fonts.css" type="text/css" media="all">
+<link rel="stylesheet" href="<?= __CA_THEME_URL__ ?>/assets/pawtucket/css/fonts.css" type="text/css" media="all">
 <script src="/assets/jquery/js/jquery.cookie.js" type="text/javascript"></script>
 <script src="/assets/jquery/js/jquery.cookiejar.js" type="text/javascript"></script>
 <script src="/assets/jquery/js/jquery.jscroll.js" type="text/javascript"></script>
@@ -53,10 +53,9 @@ $albumName = str_replace("
 <script src="/assets/ca/js/ca.googlemaps.js" type="text/javascript"></script>
 <script src="/assets/google/markerclusterer.js" type="text/javascript"></script>
 <script src="/assets/google/geolocationmarker.js" type="text/javascript"></script>
-<link rel="stylesheet" href="/themes/phoi/assets/pawtucket/css/theme.css" type="text/css" media="all">
-<link rel="stylesheet" href="/themes/phoi/assets/pawtucket/css/patch.css" type="text/css" media="all">
+<link rel="stylesheet" href="<?= __CA_THEME_URL__ ?>/assets/pawtucket/css/main.css" type="text/css" media="all">
 
-	<title>⏯ phoi.io : Firinga - Instrumental</title>
+	<title>⏯ <?= __CA_SITE_NAME__ ?> : <?= $albumName ?></title>
 
 	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.4.95/css/materialdesignicons.min.css">
@@ -119,7 +118,7 @@ $albumName = str_replace("
             <?php
                 $description = $t_repr->getWithTemplate("<unit relativeTo='ca_objects'><unit relativeTo='ca_objects.parent'>^ca_objects.preferred_labels (^ca_objects.format)</unit> > ^ca_objects.preferred_labels</unit>");
                 MetaTagManager::addMetaProperty("og:description", $description);
-                $title = "⏯ phoi.io : " . str_replace("\n", " ", $t_repr->getWithTemplate("<unit relativeTo='ca_objects'>^ca_objects.preferred_labels</unit>"));
+                $title = "⏯ " . __CA_SITE_NAME__ . " : " . str_replace("\n", " ", $t_repr->getWithTemplate("<unit relativeTo='ca_objects'>^ca_objects.preferred_labels</unit>"));
                 MetaTagManager::setWindowTitle($title);
                 MetaTagManager::addMetaProperty("og:title", $title);
                 MetaTagManager::addMetaProperty("og:image:alt", $title);
@@ -136,7 +135,7 @@ $albumName = str_replace("
         <?php
                 $description = $t_repr->getWithTemplate("<unit relativeTo='ca_objects' restrictToTypes='Album'>Image : ^ca_objects.preferred_labels (^ca_objects.format)</unit>");
                 MetaTagManager::addMetaProperty("og:description", $description);
-                $title = "📷 phoi.io : " . str_replace("\n", " ", $t_repr->getWithTemplate("<unit relativeTo='ca_objects' restrictToTypes='Album'>Image : ^ca_objects.preferred_labels</unit>"));
+                $title = "📷 " . __CA_SITE_NAME__ . " : " . str_replace("\n", " ", $t_repr->getWithTemplate("<unit relativeTo='ca_objects' restrictToTypes='Album'>Image : ^ca_objects.preferred_labels</unit>"));
                 MetaTagManager::setWindowTitle($title);
                 MetaTagManager::addMetaProperty("og:title", $title);
                 MetaTagManager::addMetaProperty("og:image:alt", $title);

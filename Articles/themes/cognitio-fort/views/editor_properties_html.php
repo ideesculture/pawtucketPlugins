@@ -10,7 +10,8 @@
     $langs = explode(",", $lang);
     $titre = $this->getVar("titre");
     $id = $this->getVar("id");
-    $article["image"] = str_replace("https://phoi.ideesculture.fr/", "/", $article["image"]);
+    $strip_hosts = [__CA_SITE_PROTOCOL__ . "://" . __CA_SITE_HOSTNAME__ . "/", "https://phoi.ideesculture.fr/", "https://www.phoi.io/"];
+    $article["image"] = str_replace($strip_hosts, "/", $article["image"]);
 
     // Check if article is programmed in the past
     $is_past = false;
@@ -148,7 +149,6 @@ https://cdn.jsdelivr.net/npm/bulma-calendar@6.1.18/dist/css/bulma-calendar.min.c
 
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://dev.phoi.io/themes/phoi/assets/pawtucket/css/theme.css">
     <link rel="stylesheet" href="style.css">
 
     <div class="container">

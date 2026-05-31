@@ -1,0 +1,11 @@
+# -------------------------------------------------------
+# Surcharge locale (par instance) de la configuration du plugin Articles.
+# Ne contient que les clés qui diffèrent de conf/articles.conf.
+# -------------------------------------------------------
+
+# Cette instance n'utilise pas les blocs album, collectage vidéo et morceau.
+editorjs_ideesculture_tools = {
+	simpleAlbum = 0,
+	simpleCollectageVideo = 0,
+	simpleMorceau = 0
+}

@@ -38,6 +38,16 @@
     max-width: 60%;
     margin: 0 auto 15px;
 }
+
+/* Réduit l'image à 50% max de la largeur de son conteneur (centrée) */
+.simple-image.halfWidth img {
+    display: block;
+    width: 50%;
+    max-width: 50%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
 .simple-image.floatRight,
 .simple-image.floatLeft {
     padding-top:10px;

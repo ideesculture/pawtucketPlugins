@@ -2,6 +2,7 @@
 ini_set("display_errors", 1);
 error_reporting(E_ERROR);
 require_once(__CA_MODELS_DIR__.'/ca_site_pages.php');
+require_once(__CA_APP_DIR__.'/plugins/Articles/lib/articles_functions.php');
 
 class EditorController extends ActionController
 {
@@ -39,18 +40,19 @@ class EditorController extends ActionController
     }
 
     # -------------------------------------------------------
+    # Returns true if the current user belongs to the "redactor" group
+    private function isRedactor() {
+        foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
+            if($group["code"] == "redactor") return true;
+        }
+        return false;
+    }
+
+    # -------------------------------------------------------
     # Functions to render views
     # -------------------------------------------------------
     public function Index($type = "")
     {
-        // Detecting through Session if we are in "partie froide" or "partie chaude"
-        session_start();
-        if(filter_var($_GET["partie"], FILTER_SANITIZE_STRING) == "froide") {
-            $_SESSION["partie"] = "froide";
-        }
-        if($_SESSION["partie"] == "froide") {
-            //$this->response->setRedirect(caNavUrl($this->request, "", "Phonotheque", "Partenaires"));
-        }
         // Get  all the pages
         $pages = ca_site_pages::getPageList();
         // Reordering to have the newest at the beginning
@@ -104,11 +106,15 @@ class EditorController extends ActionController
 
         $this->view->setVar("is_redactor", $is_redactor);
         $this->view->setVar("id", $id);
+        $this->view->setVar("editorjs_tool_flags", articles_editorjs_tool_flags());
         $this->render('editor_article_html.php');
     }
 
 	public function Upload() {
-		$upload_dir = __CA_BASE_DIR__ . "/upload/";	
+		if(!$this->isRedactor()) {
+			die("This function requires redactor privileges.");
+		}
+		$upload_dir = __CA_BASE_DIR__ . "/upload/";
 ?>
 <head>
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
@@ -237,6 +243,10 @@ if(isset($_FILES['file'])) :
 		die();
 	}
     public function SaveArticleJson() {
+        if(!$this->isRedactor()) {
+            print json_encode(["result"=>"ko", "errors"=>"This function requires redactor privileges."]);
+            return;
+        }
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -280,6 +290,7 @@ if(isset($_FILES['file'])) :
     }
 
     public function SaveArticleProperties() {
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // var_dump($_POST);
         // var_dump($id);
@@ -311,10 +322,7 @@ if(isset($_FILES['file'])) :
     }
 
     public function Publish() {
-        $is_redactor = false;
-        foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
-            if($group["code"] == "redactor") $is_redactor=true;
-        }
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -326,10 +334,7 @@ if(isset($_FILES['file'])) :
     }
 
     public function Unpublish() {
-        $is_redactor = false;
-        foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
-            if($group["code"] == "redactor") $is_redactor=true;
-        }
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -341,10 +346,7 @@ if(isset($_FILES['file'])) :
     }
 
     public function New() {
-        $is_redactor = false;
-        foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
-            if($group["code"] == "redactor") $is_redactor=true;
-        }
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
 
         $template_id= $this->request->getParameter("template_id", pInteger);
         $page = new ca_site_pages();

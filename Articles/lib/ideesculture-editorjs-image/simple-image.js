@@ -77,6 +77,7 @@ class IdeescultureEditorjsImage {
       floatLeft: data.floatLeft !== undefined ? data.floatLeft : false,
       floatRight: data.floatRight !== undefined ? data.floatRight : false,
       stretched: data.stretched !== undefined ? data.stretched : false,
+      halfWidth: data.halfWidth !== undefined ? data.halfWidth : false,
     };
 
     this.wrapper = undefined;
@@ -92,6 +93,10 @@ class IdeescultureEditorjsImage {
       {
         name: 'withBackground',
         icon: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.043 8.265l3.183-3.183h-2.924L4.75 10.636v2.923l4.15-4.15v2.351l-2.158 2.159H8.9v2.137H4.7c-1.215 0-2.2-.936-2.2-2.09v-8.93c0-1.154.985-2.09 2.2-2.09h10.663l.033-.033.034.034c1.178.04 2.12.96 2.12 2.089v3.23H15.3V5.359l-2.906 2.906h-2.35zM7.951 5.082H4.75v3.201l3.201-3.2zm5.099 7.078v3.04h4.15v-3.04h-4.15zm-1.1-2.137h6.35c.635 0 1.15.489 1.15 1.092v5.13c0 .603-.515 1.092-1.15 1.092h-6.35c-.635 0-1.15-.489-1.15-1.092v-5.13c0-.603.515-1.092 1.15-1.092z"/></svg>`
+      },
+      {
+        name: 'halfWidth',
+        icon: `<svg width="20" height="20" viewBox="-3 -3 26 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2.5 16.5v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zM1 15v1H0v-1zm19 0v1h-1v-1zM1 13v1H0v-1zm19 0v1h-1v-1zM1 11v1H0v-1zm19 0v1h-1v-1zM1 9v1H0V9zm19 0v1h-1V9zM1 7v1H0V7zm19 0v1h-1V7zM1 5v1H0V5zm19 0v1h-1V5zm0-2v1h-1V3zM1 3v1H0V3zm13.5-1.5v1h-1v-1zm2 0v1h-1v-1zm2 0v1h-1v-1zm-8 0v1h-1v-1zm-2 0v1h-1v-1zm-2 0v1h-1v-1zm-2 0v1h-1v-1zm8 0v1h-1v-1zm-10 0v1h-1v-1z"></path><path d="M10 7.5H2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2M10 9a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-6A.5.5 0 0 1 2 9z"></path></svg>`
       },
       {
         name: 'floatLeft',
@@ -190,6 +195,10 @@ class IdeescultureEditorjsImage {
     const wrapper = document.createElement('div');
 
     this.settings.forEach( tune => {
+      // Boutons float left / float right retirés du menu de l'outil image.
+      // On les garde dans this.settings pour que _acceptTuneView() applique
+      // toujours les classes (CSS et rendu des contenus existants conservés).
+      if (tune.name === 'floatLeft' || tune.name === 'floatRight') { return; }
       let button = document.createElement('div');
 
       button.classList.add(this.api.styles.settingsButton);

@@ -4,7 +4,14 @@ $access = $this->getVar("access");
 $article = $this->getVar("article");
 $page = $this->getVar("page");
 $id = $this->getVar("id");
-$article["image"] = str_replace("https://phoi.ideesculture.fr/", "/", $article["image"]);
+// Enable/disable flags for the IdéesCulture Editor.js tools (conf/articles.conf + conf/local)
+$editorjs_tool_flags = $this->getVar("editorjs_tool_flags");
+if (!is_array($editorjs_tool_flags)) { $editorjs_tool_flags = []; }
+$tool_on = function($tool) use ($editorjs_tool_flags) {
+    return articles_editorjs_tool_enabled($tool, $editorjs_tool_flags);
+};
+$strip_hosts = [__CA_SITE_PROTOCOL__ . "://" . __CA_SITE_HOSTNAME__ . "/", "https://phoi.ideesculture.fr/", "https://www.phoi.io/"];
+$article["image"] = str_replace($strip_hosts, "/", $article["image"]);
 
 // Check if article is programmed in the past
 $is_past = false;
@@ -147,32 +154,57 @@ $old_path = ucfirst($template)."s";
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.6.1/dist/bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.8.0/dist/bundle.min.js"></script>
     <!-- <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-simpleimage-left-right/simpleimage-left-right.js"></script> -->
-    <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-image/simple-image.js"></script>
+<?php if($tool_on('simpleimage')): ?>
+    <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-image/simple-image.js?date=<?= time() ?>"></script>
+<?php endif; ?>
+<?php if($tool_on('simpleaudio')): ?>
     <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-audio/simple-audio.js"></script>
+<?php endif; ?>
+<?php if($tool_on('simplevideo')): ?>
     <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-video/simple-video.js"></script>
+<?php endif; ?>
+<?php if($tool_on('simpleAlbum')): ?>
     <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-album/simple-album.js?date=<?= time() ?>"></script>
+<?php endif; ?>
+<?php if($tool_on('simpleCollectageVideo')): ?>
     <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-collectage-video/simple-collectage-video.js?date=<?= time() ?>"></script>
+<?php endif; ?>
+<?php if($tool_on('simpleMorceau')): ?>
     <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-morceau/simple-morceau.js?date=<?= time() ?>"></script>
+<?php endif; ?>
+<?php if($tool_on('caObject') || $tool_on('caOccurrence') || $tool_on('caSet')): ?>
+    <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-ca/ca-entity.js?date=<?= time() ?>"></script>
+<?php endif; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.5.3/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@1.3.0/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.5.0/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/raw@latest"></script>
 
-    <link rel="stylesheet" href="https://dev.phoi.io/themes/phoi/assets/pawtucket/css/theme.css">
     <!-- <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-simpleimage-left-right/simpleimage-left-right.css"> -->
+<?php if($tool_on('simpleimage')): ?>
     <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-image/simple-image.css">
+<?php endif; ?>
+<?php if($tool_on('simpleaudio')): ?>
     <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-audio/simple-audio.css">
+<?php endif; ?>
+<?php if($tool_on('simplevideo')): ?>
     <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-video/simple-video.css">
+<?php endif; ?>
+<?php if($tool_on('simpleAlbum')): ?>
     <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-album/simple-album.css">
-    <!--<link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-collectage-video/simple-collectage-video.css">-->
+<?php endif; ?>
+<?php if($tool_on('caObject') || $tool_on('caOccurrence') || $tool_on('caSet')): ?>
+    <link rel="stylesheet" href="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/ideesculture-editorjs-ca/ca-entity.css?date=<?= time() ?>">
+<?php endif; ?>
 
-	<script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-columns@latest"></script>
 	<!-- Load 3rd Party Tools -->
     <script src="https://cdn.jsdelivr.net/npm/editorjs-alert@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-codeflask@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-nested-checklist@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@rodrigoodhin/editorjs-image-gallery@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/editorjs-table@1.4.10/dist/bundle.js"></script>
+    <script src="<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-button/editorjs-button.js?date=<?= time() ?>"></script>
 
   
     <!-- <link rel="stylesheet" href="style.css"> -->
@@ -195,6 +227,10 @@ $old_path = ucfirst($template)."s";
                 <div style="margin:70px;font-weight: bold;font-size:1.6em;">Ces blocs sont dans un précédent format. Vous ne pouvez pas éditer cet article.<br/>Merci de vous rapprocher de l'administrateur de la base.</div>
             <?php else: ?>
 							<iframe id="upload-iframe" src="/index.php/Articles/Editor/Upload/manual.php?id=<?= $id ?>" style="width:100%;height:46px;margin:20px 0;"></iframe>
+                <div class="container" style="margin-bottom:15px;">
+                    <button class="button is-primary saveButton" id="saveButtonTop" disabled="disabled" onclick="articleSave()">Enregistrer</button>
+                    <button class="button" onclick="display()">Afficher</button>
+                </div>
 <?php if ($article["blocs"]=="{}") : ?>
 								<p><button class="button is-big is-primary" onClick="editor.focus();editor.caret.focus();$(this).hide();">Cliquer ici pour commencer à rédiger l'article...</button></p>
 <?php endif; ?>								
@@ -218,38 +254,85 @@ $old_path = ucfirst($template)."s";
 
     <script>
 
-        const editor = new EditorJS({
-                holder: 'editorjs',
-			    //autofocus: true,
-                /**
-                 * Available Tools list.
-                 * Pass Tool's class or Settings object for each Tool you want to use
-                 */
-                tools: {
+        var editor;
+        (async () => {
+            // editorjs-columns (@aaaalrashd) est distribué uniquement en ESM :
+            // bundle autonome rapatrié en local (même origine — compatible avec
+            // la politique de domaines/CSP de Pawtucket). Chargé dynamiquement ;
+            // en cas d'échec, l'éditeur fonctionne sans le bloc colonnes.
+            let Columns = null;
+            try {
+                ({ default: Columns } = await import('<?= __CA_URL_ROOT__ ?>/app/plugins/Articles/lib/editorjs-columns/editorjs-columns.js?v=1.0.5'));
+            } catch (e) {
+                console.error('Chargement de editorjs-columns échoué:', e);
+            }
+
+            const editorTools = {
                     header: Header,
-                    delimiter: Delimiter,
                     paragraph: {
                         class: Paragraph,
                         inlineToolbar: true
                     },
-                    list:{
-                      class: List,
-                      inlineToolbar: true
-                    },
                     embed: Embed,
+<?php if($tool_on('simpleimage')): ?>
                     simpleimage: {
                         class:IdeescultureEditorjsImage,
                         inlineToolbar: true
                     },
+<?php endif; ?>
+                    // Bloc colonnes (avec images déposables). Placé ici pour
+                    // apparaître entre Image et Image Gallery dans le menu.
+                    // Retiré juste après si le module n'a pas pu être chargé.
+                    columns: {
+                        class: Columns,
+                        config: {
+                            maxColumns: 4,
+                            tools: {
+                                header: Header,
+                                list: List,
+                                table: Table,
+<?php if($tool_on('simpleimage')): ?>
+                                simpleimage: IdeescultureEditorjsImage,
+<?php endif; ?>
+                            }
+                        }
+                    },
+<?php if($tool_on('caObject')): ?>
+                    caObject: {
+                        class: CAObjectTool,
+                        config: { urlRoot: '<?= __CA_URL_ROOT__ ?>' }
+                    },
+<?php endif; ?>
+<?php if($tool_on('caOccurrence')): ?>
+                    caOccurrence: {
+                        class: CAOccurrenceTool,
+                        config: { urlRoot: '<?= __CA_URL_ROOT__ ?>' }
+                    },
+<?php endif; ?>
+<?php if($tool_on('caSet')): ?>
+                    caSet: {
+                        class: CASetTool,
+                        config: { urlRoot: '<?= __CA_URL_ROOT__ ?>' }
+                    },
+<?php endif; ?>
+                    delimiter: Delimiter,
+                    list:{
+                      class: List,
+                      inlineToolbar: true
+                    },
 					imageGallery: ImageGallery,
+<?php if($tool_on('simpleaudio')): ?>
                     simpleaudio: {
                         class:SimpleAudio,
                         inlineToolbar: true
                     },
+<?php endif; ?>
+<?php if($tool_on('simplevideo')): ?>
                     simplevideo: {
                         class:SimpleVideo,
                         inlineToolbar: true
                     },
+<?php endif; ?>
                     //imageparagraph: SimpleImageLeftRight,
                     quote: {
                         class: Quote,
@@ -259,31 +342,52 @@ $old_path = ucfirst($template)."s";
                             captionPlaceholder: 'Quote\'s author',
                         },
                     },
+<?php if($tool_on('simpleAlbum')): ?>
                     simpleAlbum: {
                         class:SimpleAlbum,
                         inlineToolbar: true
                     },
+<?php endif; ?>
+<?php if($tool_on('simpleCollectageVideo')): ?>
                     simpleCollectageVideo: {
                         class:SimpleCollectageVideo,
                         inlineToolbar: true
                     },
+<?php endif; ?>
+<?php if($tool_on('simpleMorceau')): ?>
                     simpleMorceau: {
                         class:SimpleMorceau,
                         inlineToolbar: true
                     },
+<?php endif; ?>
 					raw: RawTool,
-					columns : {
-						class : editorjsColumns,
-						config : {
-						tools : {
-							header: Header,
-							alert : Alert,
-							delimiter : Delimiter
-						},
-						EditorJsLibrary : EditorJS //ref EditorJS - This means only one global thing
-						}
-					},
-                },
+                    AnyButton: {
+                        class: AnyButton,
+                        inlineToolbar: false,
+                        config: {
+                            css: {
+                                "btnColor": "button"
+                            }
+                        }
+                    },
+                    table: {
+                        class: Table,
+                        inlineToolbar: true,
+                        config: {
+                            rows: 2,
+                            cols: 3
+                        }
+                    },
+            };
+
+            // Le bloc colonnes est déclaré plus haut (entre Image et Image
+            // Gallery) ; si le module ESM n'a pas pu être chargé, on le retire
+            // pour ne pas passer une classe nulle à Editor.js.
+            if (!Columns) { delete editorTools.columns; }
+
+            editor = new EditorJS({
+                holder: 'editorjs',
+                tools: editorTools,
                 data:
                     <?= $article["blocs"] ?>,
                 onReady: () => {
@@ -302,8 +406,8 @@ $old_path = ucfirst($template)."s";
 											editor.caret.focus();
 										}, 200);
                 }
-            }
-        );
+            });
+        })();
         function articleSave(){
             editor.save().then((output) => {
                 console.log('Data: ', output);
@@ -345,7 +449,7 @@ $old_path = ucfirst($template)."s";
         jQuery(document).ready(function() {
             $(".stretched").parent().parent().addClass("ce-block--stretched");
             setTimeout(function() {
-                $('#saveButton').prop("disabled", false);
+                $('#saveButton, #saveButtonTop').prop("disabled", false);
             }, 750);
 
             // Make iframe sticky on scroll
@@ -546,6 +650,23 @@ button.is-big.is-primary {
 
 .container figure img {
 	width:100%;
+}
+
+/* editorjs-columns (@aaaalrashd) ne fournit pas la mise en page : le tool pose
+   flex-basis en inline sur chaque .ce-column mais ne met jamais le conteneur en
+   flex. On l'ajoute ici, sinon les colonnes s'empilent. */
+.ce-columns-container {
+	display: flex;
+	gap: 20px;
+	align-items: flex-start;
+}
+.ce-column {
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	border: 1px dashed #a4a4a4;
+	border-radius: 4px;
+	padding: 0 10px;
 }
     </style>
 <?php //die();

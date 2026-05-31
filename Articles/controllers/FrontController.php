@@ -2,6 +2,7 @@
 ini_set("display_errors", 1);
 error_reporting(E_ERROR);
 require_once(__CA_MODELS_DIR__.'/ca_site_pages.php');
+require_once(__CA_APP_DIR__.'/plugins/Articles/lib/articles_functions.php');
 
 class FrontController extends ActionController
 {
@@ -36,15 +37,6 @@ class FrontController extends ActionController
     {
         global $g_ui_locale;
         
-        // Detecting through 
-        //Session if we are in "partie froide" or "partie chaude"
-        session_start();
-        if(filter_var($_GET["partie"], FILTER_SANITIZE_STRING) == "froide") {
-            $_SESSION["partie"] = "froide";
-        }
-        if($_SESSION["partie"] == "froide") {
-            //$this->response->setRedirect(caNavUrl($this->request, "", "Phonotheque", "Partenaires"));
-        }
         // Get  all the pages
         $pages = ca_site_pages::getPageList();
         // Reordering to have the newest at the beginning
@@ -178,11 +170,4 @@ class FrontController extends ActionController
         $this->render('front/front_page_html.php');
     }
 }
-
-function date_compare($a, $b)
-{
-    $t1 = strtotime($a['date_from']);
-    $t2 = strtotime($b['date_from']);
-    return $t2 - $t1;
-}   
 ?>

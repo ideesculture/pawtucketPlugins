@@ -35,7 +35,7 @@ if($article["date_from"]) {
             <figure class="image is-3by2">
             <a href="/index.php/Articles/Display/Details/id/<?php _p($id); ?>">
                 <?php 
-                	$article["image"] = str_replace("https://phoi.ideesculture.fr/", "/", $article["image"]);
+                	$article["image"] = str_replace([__CA_SITE_PROTOCOL__ . "://" . __CA_SITE_HOSTNAME__ . "/", "https://phoi.ideesculture.fr/", "https://www.phoi.io/"], "/", $article["image"]);
                     if($article["image"]):
                 ?>
                 <img src="<?= $article["image"] ?>" alt="image thumbnail" style="max-height:180px;max-width: 220px;">

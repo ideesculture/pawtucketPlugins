@@ -4,6 +4,7 @@ $pagination = 10;
 ini_set("display_errors", 1);
 error_reporting(E_ERROR);
 require_once(__CA_MODELS_DIR__.'/ca_site_pages.php');
+require_once(__CA_APP_DIR__.'/plugins/Articles/lib/articles_functions.php');
 
 class ShowController extends ActionController
 {
@@ -241,6 +242,7 @@ class ShowController extends ActionController
         foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
             if($group["code"] == "redactor") $is_redactor=true;
         }
+        if(!$is_redactor) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -256,6 +258,7 @@ class ShowController extends ActionController
         foreach($this->getRequest()->getUser()->getUserGroups() as $group) {
             if($group["code"] == "redactor") $is_redactor=true;
         }
+        if(!$is_redactor) die("This function requires redactor privileges.");
         $id= $this->request->getParameter("id", pInteger);
         // TODO Redirect if no ID
         $page = new ca_site_pages($id);
@@ -335,11 +338,4 @@ class ShowController extends ActionController
     }
 
 }
-
-function date_compare($a, $b)
-{
-    $t1 = strtotime($a['date_from']);
-    $t2 = strtotime($b['date_from']);
-    return $t2 - $t1;
-}   
 ?>

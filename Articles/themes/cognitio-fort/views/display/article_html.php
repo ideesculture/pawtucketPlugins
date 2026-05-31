@@ -5,6 +5,7 @@
 	</div>
 </div>
 <?php
+require_once(__CA_APP_DIR__.'/plugins/Articles/lib/articles_functions.php');
 $next = $this->getVar("next_id");
 $prev = $this->getVar("prev_id");
 
@@ -73,7 +74,12 @@ switch ($template_id) {
 }
 $old_path = ucfirst($template) . "s";
 
-MetaTagManager::addMetaProperty("og:url", "https://www.phoi.io/index.php/Articles/Display/Details/id/" . $id);
+// Absolute site root, derived from the deployed CollectiveAccess host
+$site_root = __CA_SITE_PROTOCOL__ . "://" . __CA_SITE_HOSTNAME__;
+// Hosts (current + legacy) that should be stripped from stored content to make URLs relative
+$strip_hosts = [$site_root . "/", "https://phoi.ideesculture.fr/", "https://www.phoi.io/"];
+
+MetaTagManager::addMetaProperty("og:url", $site_root . "/index.php/Articles/Display/Details/id/" . $id);
 MetaTagManager::addMetaProperty("og:type", "website");
 MetaTagManager::addMeta("twitter:card", "summary");
 $blocs = json_decode($article["blocs"], true);
@@ -211,9 +217,9 @@ $playlisttracks = [];
                     // convert markdown links to html links
                     $bloc["content"] = preg_replace('/\[([^\]]+)\]\(([^\)]+)\)/', '<a href="\2">\1</a>', $bloc["content"]);
 
-                    $bloc["image"] = str_replace("https://phoi.ideesculture.fr/", "/", $bloc["image"]);
-                    $bloc["image1"] = str_replace("https://phoi.ideesculture.fr/", "/", $bloc["image1"]);
-                    $bloc["image2"] = str_replace("https://phoi.ideesculture.fr/", "/", $bloc["image2"]);
+                    $bloc["image"] = str_replace($strip_hosts, "/", $bloc["image"]);
+                    $bloc["image1"] = str_replace($strip_hosts, "/", $bloc["image1"]);
+                    $bloc["image2"] = str_replace($strip_hosts, "/", $bloc["image2"]);
 
                     switch ($bloc["type"]):
                         case "simpleAlbum":
@@ -233,7 +239,7 @@ $playlisttracks = [];
                             <div class="simple-album">
                                 <div class="card is-horizontal">
                                     <div class="card-image">
-                                        <figure class="image"><img src="https://www.phoi.io/media/collectiveaccess/images/1/0/9/45241_ca_object_representations_media_10915_page.jpg" alt="Ségas"></figure>
+                                        <figure class="image"><img src="<?= $site_root . __CA_URL_ROOT__ ?>/app/plugins/Articles/assets/placeholder-white.png" alt="<?= htmlspecialchars($vt_object->getWithTemplate("^ca_objects.preferred_labels")) ?>"></figure>
                                     </div>
                                     <div class="card-content">
                                         <div class="media">
@@ -290,43 +296,30 @@ $playlisttracks = [];
                         case "paragraph":
                             $text = $bloc["data"]["text"];
 
-                            // Recherche des liens vers le thésaurus
-                            preg_match_all("|<a href=\"https://www.phoi.io/index.php/Thesaurus/View/Index/tag/([0-9]+)\">(.*)</a>|", $text, $matches);
-                            foreach ($matches[2] as $key => $match) {
-                                $match_id = $matches[1][$key];
-                                //var_dump($match_id);
-                                //var_dump($match);
-                                $substring = "<a href=\"https://www.phoi.io/index.php/Thesaurus/View/Index/tag/" . $match_id . "\">" . $match . "</a>";
+                            // Recherche des liens vers le thésaurus (host-agnostique : courant + hérités)
+                            preg_match_all("|<a href=\"(https?://[^/\"]+)/index.php/Thesaurus/View/Index/tag/([0-9]+)\">([^<]*)</a>|", $text, $matches);
+                            foreach ($matches[3] as $key => $match) {
+                                $host = $matches[1][$key];
+                                $match_id = $matches[2][$key];
+                                $substring = "<a href=\"" . $host . "/index.php/Thesaurus/View/Index/tag/" . $match_id . "\">" . $match . "</a>";
                                 $replacement = "<a class=\"hasTooltip\" data-style=\"qtip-light\" data-tooltip=\"" . $match . "\" href=\"/index.php/Thesaurus/View/Index/tag/" . $match_id . "\">" . $match . "</a>";
-                                //var_dump($substring);
                                 $text = str_replace($substring, $replacement, $text);
                             }
 
-                            // Recherche des liens vers les fiches objet
-                            preg_match_all("|<a href=\"https://www.phoi.io/index.php/Detail/objects/([0-9]+)\">(.*)</a>|", $text, $matches);
-                            foreach ($matches[2] as $key => $match) {
-                                $match_id = $matches[1][$key];
-                                //var_dump($match_id);
-                                //var_dump($match);
-                                $substring = "<a href=\"https://www.phoi.io/index.php/Detail/objects/" . $match_id . "\">" . $match . "</a>";
+                            // Recherche des liens vers les fiches objet (host-agnostique : courant + hérités)
+                            preg_match_all("|<a href=\"(https?://[^/\"]+)/index.php/Detail/objects/([0-9]+)\">([^<]*)</a>|", $text, $matches);
+                            foreach ($matches[3] as $key => $match) {
+                                $host = $matches[1][$key];
+                                $match_id = $matches[2][$key];
+                                $substring = "<a href=\"" . $host . "/index.php/Detail/objects/" . $match_id . "\">" . $match . "</a>";
                                 $replacement = "<a class=\"hasTooltip\" data-style=\"qtip-light\" data-tooltip=\"" . $match . "\" href=\"/index.php/Detail/objects/" . $match_id . "\">" . $match . "</a>";
-                                //var_dump($substring);
                                 $text = str_replace($substring, $replacement, $text);
                             }
-                            //$text = str_replace("href=\"https://www.phoi.io/index.php/Thesaurus/View/Index/tag", "class=\"hasTooltip\" href=\"/index.php/Thesaurus/View/Index/tag", $text );
                         ?>
 
                             <article class="article-content">
                                 <p><?= $text  ?></p>
                             </article>
-
-                        <?php break;
-                        case "quote": ?>
-
-                            <article class="article-content">
-                                <div class="quote"><?php _p($bloc["content"]); ?></div>
-                            </article>
-
 
                         <?php break;
                         case "large-image":
@@ -499,12 +492,71 @@ $playlisttracks = [];
                             
                                 }; 
                             break;
+						case "table":
+							$rows = isset($bloc["data"]["content"]) ? $bloc["data"]["content"] : [];
+							if (is_array($rows) && count($rows) > 0) {
+								$with_headings = !empty($bloc["data"]["withHeadings"]);
+								print '<article class="article-content"><table>';
+								foreach ($rows as $r_index => $row) {
+									if (!is_array($row)) continue;
+									$cell_tag = ($with_headings && $r_index === 0) ? "th" : "td";
+									print "<tr>";
+									foreach ($row as $cell) {
+										// Cells may contain inline HTML produced by the editor — print as-is
+										print "<{$cell_tag}>" . $cell . "</{$cell_tag}>";
+									}
+									print "</tr>";
+								}
+								print '</table></article>';
+							}
+							break;
 						case "columns":
-							var_dump($bloc);
-							//die();
+							// @aaaalrashd/editorjs-columns : { columns, ratio, blocks:[ [..], .. ], style }
+							$cols_blocks = isset($bloc["data"]["blocks"]) && is_array($bloc["data"]["blocks"]) ? $bloc["data"]["blocks"] : [];
+							$ratio = isset($bloc["data"]["ratio"]) && is_array($bloc["data"]["ratio"]) ? $bloc["data"]["ratio"] : [];
+							if (count($cols_blocks) > 0) {
+								print '<article class="article-content"><div class="columns editorjs-columns">';
+								foreach ($cols_blocks as $ci => $col_blocks) {
+									$flex = isset($ratio[$ci]) ? ' style="flex:' . floatval($ratio[$ci]) . ' 1 0"' : '';
+									print '<div class="column"' . $flex . '>';
+									if (is_array($col_blocks)) {
+										foreach ($col_blocks as $inner) {
+											print articles_render_inner_block($inner, $strip_hosts);
+										}
+									}
+									print '</div>';
+								}
+								print '</div></article>';
+							}
 							break;
 						case "raw":
 							print $bloc["data"]["html"];
+							break;
+						case "caObject":
+						case "caOccurrence":
+						case "caSet":
+							$ca_id = isset($bloc["data"]["id"]) ? $bloc["data"]["id"] : "";
+							$ca_type_map = ["caObject" => "objects", "caOccurrence" => "occurrences", "caSet" => "sets"];
+							if ($ca_id !== "" && isset($ca_type_map[$bloc["type"]])) {
+								$ca_html = articles_render_ca_entity($ca_type_map[$bloc["type"]], $ca_id);
+								if ($ca_html !== "") {
+									print '<article class="article-content ca-entity">' . $ca_html . '</article>';
+								}
+							}
+							break;
+						case "AnyButton":
+							$btn_text = isset($bloc["data"]["text"]) ? trim($bloc["data"]["text"]) : "";
+							$btn_link = isset($bloc["data"]["link"]) ? trim($bloc["data"]["link"]) : "";
+							// Strip known hosts so internal links stay relative
+							$btn_link = str_replace($strip_hosts, "/", $btn_link);
+							if ($btn_text !== "" && $btn_link !== "") {
+								$is_external = (bool)preg_match('|^https?://|', $btn_link);
+							?>
+							<article class="article-content has-text-centered">
+								<a class="button is-primary" href="<?= htmlspecialchars($btn_link) ?>"<?= $is_external ? ' target="_blank" rel="noopener noreferrer"' : '' ?>><?= htmlspecialchars($btn_text) ?></a>
+							</article>
+							<?php
+							}
 							break;
                         default:
                             //var_dump($bloc);die();
@@ -889,6 +941,16 @@ if (count($va_other_expos) > 0):
 	width:100%;
 }
 
+/* Option "50%" de l'outil image : 50% max de la largeur du conteneur, centrée */
+.simple-image.halfWidth img {
+	width:50% !important;
+	max-width:50% !important;
+	height:auto;
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+}
+
 .simple-image.withBackground {
 	background:#264684;
 	padding: 50px 80px;
@@ -985,5 +1047,31 @@ if (count($va_other_expos) > 0):
 }
 .article-content table td img {
 	width:100%;
+}
+
+/* Bloc CA Object — carte enrichie */
+.ca-entity .ca-object-card {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	border-radius: 4px;
+	padding: 14px;
+}
+.ca-entity .ca-object-card__image img {
+	display: block;
+	width: 170px !important;
+	height: auto;
+	border-radius: 3px;
+}
+.ca-entity .ca-object-card__body {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.ca-entity .ca-object-card__title {
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+.ca-entity .ca-object-card__body p {
+	margin: 2px 0;
 }
 </style>

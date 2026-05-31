@@ -3,7 +3,7 @@
 ?>
 <head>
     <title>CollectiveAccess</title>
-    <link rel='stylesheet' href='<?= __CA_URL_ROOT__?>/themes/phoi/assets/pawtucket/css/theme.css' type='text/css' media='all'/>
+    <link rel='stylesheet' href='<?= __CA_THEME_URL__ ?>/assets/pawtucket/css/main.css' type='text/css' media='all'/>
 </head>
 <body>
     <div class="columns is-mobile">
