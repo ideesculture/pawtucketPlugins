@@ -255,6 +255,8 @@ if(isset($_FILES['file'])) :
         $article["blocs"]=json_encode($_POST);
         $article["blocs"]=str_replace('"false"',"false",$article["blocs"]);
         $article["blocs"]=str_replace('"true"',"true",$article["blocs"]);
+        // Versioning : snapshot du JSON avant l'enregistrement en base
+        articles_store_article_version($id, $article["blocs"]);
         $page->set("content", $article);
         $page->update();
         if($page->numErrors()) {
@@ -366,6 +368,53 @@ if(isset($_FILES['file'])) :
         $page->update();
 
         $this->redirect("/index.php/Articles/Editor/Properties/id/".$id);
+    }
+
+    /**
+     * Liste les versions sauvegardées d'un article (snapshots JSON).
+     */
+    public function Versions() {
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
+        $id = $this->request->getParameter("id", pInteger);
+        $page = new ca_site_pages($id);
+        $this->view->setVar("page", $page);
+        $this->view->setVar("access", $page->get("access"));
+        $this->view->setVar("id", $id);
+        $this->view->setVar("is_redactor", true);
+        $this->view->setVar("versions", articles_list_article_versions($id));
+        $this->render('editor_versions_html.php');
+    }
+
+    /**
+     * Restaure une version : remet son JSON dans le contenu de l'article.
+     * Le contenu courant est d'abord snapshoté (la restauration est réversible).
+     */
+    public function RestoreVersion() {
+        if(!$this->isRedactor()) die("This function requires redactor privileges.");
+        $id = $this->request->getParameter("id", pInteger);
+        $version = $this->request->getParameter("version", pString);
+
+        $vs_file = articles_version_file($id, $version);
+        if(!$vs_file) {
+            $this->opo_notification_manager->addNotification(_t("Version introuvable."));
+            $this->redirect("/index.php/Articles/Editor/Versions/id/".$id);
+            return;
+        }
+
+        $vs_blocs = file_get_contents($vs_file);
+        $page = new ca_site_pages($id);
+        $page->setMode(ACCESS_WRITE);
+        $content = $page->get("content");
+
+        // Snapshot du contenu courant avant restauration (réversibilité)
+        articles_store_article_version($id, isset($content["blocs"]) ? $content["blocs"] : "");
+
+        $content["blocs"] = $vs_blocs;
+        $page->set("content", $content);
+        $page->update();
+
+        $this->opo_notification_manager->addNotification(_t("Version restaurée."));
+        $this->redirect("/index.php/Articles/Editor/Article/id/".$id);
     }
 
 }

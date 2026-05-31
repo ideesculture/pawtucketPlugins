@@ -284,3 +284,122 @@ if (!function_exists('articles_render_ca_entity')) {
         return articles_render_ca_card($t, $conf, $vs_detail);
     }
 }
+
+if (!function_exists('articles_versions_dir')) {
+    /**
+     * Répertoire (persistant) de stockage des versions d'articles.
+     * Configurable via article_versions_dir ; défaut : <plugins>/Articles/backup.
+     * Crée le répertoire au besoin.
+     *
+     * @return string chemin absolu
+     */
+    function articles_versions_dir() {
+        $o_conf = Configuration::load(__CA_APP_DIR__ . '/plugins/Articles/conf/articles.conf');
+        $vs_dir = trim((string)$o_conf->get('article_versions_dir'));
+        if ($vs_dir === '') { $vs_dir = __CA_APP_DIR__ . '/plugins/Articles/backup'; }
+        if (!is_dir($vs_dir)) { @mkdir($vs_dir, 02775, true); }
+        return $vs_dir;
+    }
+}
+
+if (!function_exists('articles_versions_keep')) {
+    /**
+     * Nombre de versions conservées par article (défaut 25, minimum 1).
+     * @return int
+     */
+    function articles_versions_keep() {
+        $o_conf = Configuration::load(__CA_APP_DIR__ . '/plugins/Articles/conf/articles.conf');
+        $vn = (int)$o_conf->get('article_versions_keep');
+        return $vn > 0 ? $vn : 25;
+    }
+}
+
+if (!function_exists('articles_store_article_version')) {
+    /**
+     * Snapshote le JSON des blocs d'un article dans le répertoire de versions,
+     * puis élague pour ne garder que les N plus récentes (article_versions_keep).
+     * Le contenu vide ("" ou "{}") n'est pas stocké.
+     *
+     * @param int    $pn_id        page_id de l'article
+     * @param string $ps_blocs_json JSON des blocs
+     * @return string|null chemin du fichier écrit, ou null
+     */
+    function articles_store_article_version($pn_id, $ps_blocs_json) {
+        $pn_id = (int)$pn_id;
+        if ($pn_id <= 0) { return null; }
+        $ps_blocs_json = trim((string)$ps_blocs_json);
+        if ($ps_blocs_json === '' || $ps_blocs_json === '{}') { return null; }
+
+        $vs_dir = articles_versions_dir();
+        if (!is_writable($vs_dir)) { return null; }
+
+        $vs_ts = date('Ymd-His');
+        $vs_file = $vs_dir . '/article_' . $pn_id . '_' . $vs_ts . '.json';
+        $vn_i = 0;
+        while (file_exists($vs_file)) { // collision dans la même seconde
+            $vn_i++;
+            $vs_file = $vs_dir . '/article_' . $pn_id . '_' . $vs_ts . '-' . $vn_i . '.json';
+        }
+        @file_put_contents($vs_file, $ps_blocs_json);
+
+        // Élagage : ne garder que les N plus récents pour cet article
+        $va_files = glob($vs_dir . '/article_' . $pn_id . '_*.json');
+        $vn_keep = articles_versions_keep();
+        if (is_array($va_files) && count($va_files) > $vn_keep) {
+            usort($va_files, function($a, $b) { return filemtime($a) - filemtime($b); }); // plus ancien d'abord
+            $vn_excess = count($va_files) - $vn_keep;
+            for ($k = 0; $k < $vn_excess; $k++) { @unlink($va_files[$k]); }
+        }
+        return $vs_file;
+    }
+}
+
+if (!function_exists('articles_list_article_versions')) {
+    /**
+     * Liste les versions stockées d'un article, de la plus récente à la plus
+     * ancienne.
+     *
+     * @param int $pn_id page_id
+     * @return array liste de [ version, mtime, size, file ]
+     */
+    function articles_list_article_versions($pn_id) {
+        $pn_id = (int)$pn_id;
+        $vs_dir = articles_versions_dir();
+        $va_files = glob($vs_dir . '/article_' . $pn_id . '_*.json');
+        if (!is_array($va_files)) { return []; }
+        usort($va_files, function($a, $b) { return filemtime($b) - filemtime($a); }); // plus récent d'abord
+
+        $va_out = [];
+        foreach ($va_files as $vs_f) {
+            $vs_base = basename($vs_f);
+            // identifiant de version = ce qui suit "article_<id>_" sans ".json"
+            $vs_vid = preg_replace('/^article_' . $pn_id . '_(.+)\.json$/', '$1', $vs_base);
+            $va_out[] = [
+                'version' => $vs_vid,
+                'mtime'   => filemtime($vs_f),
+                'size'    => filesize($vs_f),
+                'file'    => $vs_f,
+            ];
+        }
+        return $va_out;
+    }
+}
+
+if (!function_exists('articles_version_file')) {
+    /**
+     * Résout le chemin d'un fichier de version pour un article, en validant
+     * l'identifiant (pas de traversée de répertoire) et l'appartenance au dossier.
+     *
+     * @param int    $pn_id      page_id
+     * @param string $ps_version identifiant de version (ex. 20260531-084500)
+     * @return string|null chemin si valide et existant, sinon null
+     */
+    function articles_version_file($pn_id, $ps_version) {
+        $pn_id = (int)$pn_id;
+        $ps_version = preg_replace('/[^0-9A-Za-z_\-]/', '', (string)$ps_version);
+        if ($ps_version === '') { return null; }
+        $vs_dir = articles_versions_dir();
+        $vs_file = $vs_dir . '/article_' . $pn_id . '_' . $ps_version . '.json';
+        return file_exists($vs_file) ? $vs_file : null;
+    }
+}

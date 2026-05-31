@@ -39,10 +39,13 @@ détection du rôle `redactor`, tri par `date_from`).
 
 ### `EditorController.php` — back-office rédacteur
 - `Article()` → vue éditeur Editor.js
-- `SaveArticleJson()` → POST AJAX, enregistre `content.blocs`
+- `SaveArticleJson()` → POST AJAX, enregistre `content.blocs` (snapshote une
+  version avant l'écriture, cf. Versioning)
 - `Properties()` / `SaveArticleProperties()` → métadonnées (titre, dates, image…)
 - `New()` → crée une `ca_site_pages` puis redirige vers Properties
 - `Publish()` / `Unpublish()` → bascule `access`
+- `Versions()` → liste les versions sauvegardées ; `RestoreVersion()` → restaure
+  une version (snapshote le contenu courant avant, donc réversible)
 - `Upload()` → uploader d'images/médias autonome (HTML inline + Bootstrap),
   chargé dans une `<iframe>`
 
@@ -276,6 +279,33 @@ référence de champ (texte libre) produit un `<p>` sans classe.
 
 Pour enrichir un type, il suffit d'ajouter/d'éditer ses clés `<prefix>_*` dans
 `conf/articles.conf` (ou `conf/local/articles.conf`) — aucun code à toucher.
+
+## Versioning des articles
+
+Seule la dernière version vit en base (`content.blocs`). Avant **chaque**
+enregistrement, le JSON des blocs est snapshoté sur disque, pour pouvoir
+restaurer un contenu perdu (copier-coller hasardeux, etc.).
+
+- **Stockage** : `lib/articles_functions.php` —
+  `articles_store_article_version($id, $blocsJson)` écrit
+  `article_<id>_<Ymd-His>.json` dans le répertoire de versions, puis élague pour
+  ne garder que les N plus récents (`article_versions_keep`, déf. 25). Le contenu
+  vide (`""`/`{}`) n'est pas stocké.
+- **Répertoire** : `articles_versions_dir()` → `article_versions_dir` de la conf,
+  ou par défaut **`plugins/Articles/backup`** (persistant ; PAS `app/tmp` qui peut
+  être purgé). Le dossier est gitignoré (`backup/*`, sauf `.gitkeep`) et doit être
+  inscriptible par le serveur web (setgid + groupe `www-data`).
+- **Listing / résolution** : `articles_list_article_versions($id)` (plus récent
+  d'abord) ; `articles_version_file($id, $version)` (valide l'identifiant — pas
+  de traversée de répertoire — et l'existence).
+- **Déclenchement** : `SaveArticleJson()` appelle `articles_store_article_version`
+  avant `update()`. `RestoreVersion()` snapshote le contenu courant puis réinjecte
+  le JSON de la version choisie (réversible).
+- **UI** : bouton **Versions** (`mdi-history`) dans la barre haute (éditeur,
+  propriétés, affichage) → vue `editor_versions_html.php` listant
+  « Version du JJ/MM/AAAA à HH:MM » + taille + bouton **Restaurer** (avec
+  `confirm()`). Routes : `Articles/Editor/Versions/id/<id>` et
+  `Articles/Editor/RestoreVersion/id/<id>/version/<version>`.
 
 ## Conventions URLs/thème (rappel)
 

@@ -69,6 +69,11 @@
                     <span class="icon"><i class="mdi mdi-eye"></i></span>&nbsp; <?php _p("Afficher"); ?>
                 </button>
             </a>
+            <a href="/index.php/Articles/Editor/Versions/id/<?= $id ?>">
+                <button class="button action-btn add-new is-uppercase has-text-centered">
+                    <span class="icon"><i class="mdi mdi-history"></i></span>&nbsp; <?php _p("Versions"); ?>
+                </button>
+            </a>
 
             <button class="button action-btn add-new is-uppercase has-text-centered is-dark" onClick="$('#delete').show();">
                 <span class="icon"><i class="mdi mdi-delete"></i></span>&nbsp; <?php _p("Supprimer"); ?>
