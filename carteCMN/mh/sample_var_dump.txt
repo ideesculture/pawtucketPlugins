@@ -1,0 +1,179 @@
+
+object(stdClass)#79 (3) {
+  ["type"]=>
+  string(7) "Feature"
+  ["geometry"]=>
+  object(stdClass)#80 (2) {
+    ["type"]=>
+    string(5) "Point"
+    ["coordinates"]=>
+    array(2) {
+      [0]=>
+      float(7.2917625111823)
+      [1]=>
+      float(48.072006036432)
+    }
+  }
+  ["properties"]=>
+  object(stdClass)#81 (75) {
+    ["reference"]=>
+    string(10) "PA00135163"
+    ["destination_actuelle_de_l_edifice"]=>
+    NULL
+    ["adresse_forme_index"]=>
+    string(23) "Synagogue (rue de la) 1"
+    ["etablissement_affectataire_de_l_edifice"]=>
+    NULL
+    ["autre_appellation_de_l_edifice"]=>
+    NULL
+    ["nature_de_la_protection"]=>
+    string(8) "arrêté"
+    ["auteur_de_l_edifice"]=>
+    string(28) "Felder (maître de l'oeuvre)"
+    ["cadastre"]=>
+    string(10) "1994 4 141"
+    ["commune_forme_index"]=>
+    string(11) "Wintzenheim"
+    ["copyright"]=>
+    string(652) "(c) Monuments historiques. Cette notice reprend intégralement les termes de l’arrêté de protection au titre des Monuments historiques. Elle répond à l’obligation réglementaire du ministère de la Culture d’établir la liste générale des édifices protégés (art. R. 621-80 du Code du patrimoine). Elle est donc opposable et fait foi juridiquement. Aucune copie numérique ou papier ne sera fournie par courrier ni courriel. Le dossier de protection complet et l’arrêté sont consultables uniquement sur place, dans la salle de lecture de la Médiathèque du patrimoine et de la photographie (MPP), à Charenton-le-Pont (Val-de-Marne)."
+    ["type_de_couverture"]=>
+    NULL
+    ["datation_de_l_edifice"]=>
+    string(9) "1850;1870"
+    ["denomination_de_l_edifice"]=>
+    string(9) "synagogue"
+    ["lieu_de_conservation_d_un_element_architectural_deplace"]=>
+    NULL
+    ["description_de_l_edifice"]=>
+    NULL
+    ["dimensions_normalisees_des_edicules_uniquement"]=>
+    NULL
+    ["date_de_label"]=>
+    NULL
+    ["date_de_la_derniere_mise_a_jour"]=>
+    string(10) "2022-12-09"
+    ["date_de_creation_de_la_notice"]=>
+    string(10) "1996-12-18"
+    ["domaine"]=>
+    NULL
+    ["typologie_du_dossier"]=>
+    string(21) "dossier de protection"
+    ["date_et_typologie_de_la_protection"]=>
+    string(23) "1995/12/11 : inscrit MH"
+    ["departement_format_numerique"]=>
+    string(2) "68"
+    ["partie_d_elevation_exterieure"]=>
+    NULL
+    ["source_de_l_energie_utilisee_par_l_edifice"]=>
+    NULL
+    ["emplacement_forme_et_structure_de_l_escalier"]=>
+    NULL
+    ["description_de_l_elevation_interieure"]=>
+    NULL
+    ["etat_de_conservation"]=>
+    NULL
+    ["cadre_de_l_etude"]=>
+    string(24) "recensement immeubles MH"
+    ["genre_du_destinataire"]=>
+    string(8) "de juifs"
+    ["historique"]=>
+    string(458) "La synagogue a été construite dans la seconde moitié du 18ème siècle, agrandie une première fois en 1850, puis en 1870 par Felder dans le style néo-roman (la structure est celle que nous connaissons actuellement). Les verrières sont toutes de style Baltard. Le bâtiment a été rénové en 1995. Le siège du Consistoire Israélite du Haut Rhin a été instauré à Wintzenheim par Napoléon 1er et il y est resté jusquà son transfert à Colmar."
+    ["nom_du_cours_d_eau_traversant_ou_bordant_l_edifice"]=>
+    NULL
+    ["identifiant_agregee"]=>
+    string(6) "ITNK2R"
+    ["cog_insee_lors_de_la_protection"]=>
+    array(1) {
+      [0]=>
+      string(5) "68374"
+    }
+    ["justification_attribution"]=>
+    NULL
+    ["justification_de_la_datation"]=>
+    NULL
+    ["liens_externes"]=>
+    NULL
+    ["lieudit"]=>
+    NULL
+    ["lien_vers_la_base_archiv_mh"]=>
+    string(143) "https://archives-map.culture.gouv.fr/archive/recherche/simple/n:19?RECH_S=PA00135163&RECH_DocumentsNumerises=0&Archives.RECH_Valid=&type=simple"
+    ["materiaux_du_gros_oeuvre"]=>
+    NULL
+    ["observations"]=>
+    NULL
+    ["precision_affectataire"]=>
+    NULL
+    ["partie_constituante_non_etudiee"]=>
+    NULL
+    ["partie_constituante"]=>
+    NULL
+    ["precision_sur_la_denomination"]=>
+    NULL
+    ["personnes_liees_a_l_edifice"]=>
+    NULL
+    ["typologie_de_plan"]=>
+    NULL
+    ["precision_de_la_localisation"]=>
+    string(32) "Anciennement région de : Alsace"
+    ["precision_de_la_protection"]=>
+    string(73) "la synagogue (cad. 4 141) : inscription par arrêté du 11 décembre 1995"
+    ["description_de_l_iconographie"]=>
+    NULL
+    ["typologie_de_la_protection"]=>
+    string(10) "inscrit MH"
+    ["precision_sur_le_statut_de_l_edifice"]=>
+    string(50) "propriété du consistoire israélite du Haut-Rhin"
+    ["reference_a_un_ensemble"]=>
+    NULL
+    ["lien_vers_la_base_joconde"]=>
+    NULL
+    ["lien_vers_la_base_palissy"]=>
+    NULL
+    ["references_des_parties_constituantes_etudiees"]=>
+    NULL
+    ["region"]=>
+    array(1) {
+      [0]=>
+      string(9) "Grand Est"
+    }
+    ["departement_en_lettres"]=>
+    array(1) {
+      [0]=>
+      string(9) "Haut-Rhin"
+    }
+    ["elements_remarquables_dans_l_edifice"]=>
+    NULL
+    ["remploi"]=>
+    NULL
+    ["renvoi_vers_une_notice_de_la_base_merimee_ou_palissy"]=>
+    string(10) "IA68003777"
+    ["indexation_iconographique_normalisee"]=>
+    NULL
+    ["siecle_de_campagne_secondaire_de_construction"]=>
+    NULL
+    ["siecle_de_la_campagne_principale_de_construction"]=>
+    string(45) "2e moitié 18e siècle;2e moitié 19e siècle"
+    ["format_abrege_du_siecle_de_construction"]=>
+    string(6) "19e s."
+    ["typologie_de_la_zone_de_protection"]=>
+    NULL
+    ["statut_juridique_de_l_edifice"]=>
+    string(39) "propriété d'une association cultuelle"
+    ["technique_du_decor_porte_de_l_edifice"]=>
+    NULL
+    ["titre_editorial_de_la_notice"]=>
+    string(9) "Synagogue"
+    ["materiaux_de_la_couverture"]=>
+    NULL
+    ["couverts_ou_decouverts_du_jardin_de_l_edifice"]=>
+    NULL
+    ["vocable_pour_les_edifices_cultuels"]=>
+    NULL
+    ["typologie_du_couvrement"]=>
+    NULL
+    ["adresse_forme_editoriale"]=>
+    string(21) "1 rue de la Synagogue"
+    ["commune_forme_editoriale"]=>
+    string(11) "Wintzenheim"
+  }
+}

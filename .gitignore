@@ -1,0 +1,11 @@
+carteCMN/batiments-etat/*.geojson
+carteCMN/batiments-etat/*.json
+carteCMN/cadastre/*.geojson
+carteCMN/cadastre/*.json
+carteCMN/cadastre/*.gz
+carteCMN/cadastre/*.json.gz
+*.json.gz
+carteCMN/mh/*.json
+carteCMN/mh/*.geojson
+carteCMN/spr/geometry_communes/*.json
+spr*.geojson

@@ -1,0 +1,76 @@
+
+object(stdClass)#106 (3) {
+  ["type"]=>
+  string(7) "Feature"
+  ["geometry"]=>
+  object(stdClass)#111 (2) {
+    ["type"]=>
+    string(5) "Point"
+    ["coordinates"]=>
+    array(2) {
+      [0]=>
+      float(9.453749)
+      [1]=>
+      float(42.70439)
+    }
+  }
+  ["properties"]=>
+  object(stdClass)#110 (28) {
+    ["code_chorus"]=>
+    string(18) "CORS/205588/465739"
+    ["id"]=>
+    string(13) "IB00100302550"
+    ["designation_site"]=>
+    string(27) "Magasin de la Bergeronnette"
+    ["designation_batiment_terrain"]=>
+    string(27) "Magasin de la Bergeronnette"
+    ["type"]=>
+    string(19) "Bâtiment technique"
+    ["fonction"]=>
+    string(6) "Garage"
+    ["adresse"]=>
+    string(10) "0  QU NORD"
+    ["ville"]=>
+    string(6) "Bastia"
+    ["dept"]=>
+    string(2) "2B"
+    ["code_postal"]=>
+    string(5) "20200"
+    ["code_insee"]=>
+    string(5) "2B033"
+    ["libelle_nouvelle_region"]=>
+    string(5) "Corse"
+    ["pays"]=>
+    string(6) "France"
+    ["latitude"]=>
+    string(8) "42.70439"
+    ["longitude"]=>
+    string(8) "9.453749"
+    ["ministere"]=>
+    string(22) "Biens remis au Domaine"
+    ["libelle_gestionnaire"]=>
+    string(46) "BIENS REMIS AU DOMAINE  Partenaire générique"
+    ["type_gestionnaire"]=>
+    string(4) "Etat"
+    ["libelle_proprietaire"]=>
+    string(40) "ETAT DOMAINE PRIVE  PARTENAIRE GENERIQUE"
+    ["type_proprietaire"]=>
+    string(4) "Etat"
+    ["surface_m2"]=>
+    float(73)
+    ["consommation_kwh_ef"]=>
+    NULL
+    ["type_de_chauffage"]=>
+    NULL
+    ["etat_de_sante"]=>
+    NULL
+    ["annee_de_construction"]=>
+    string(4) "1849"
+    ["tri_des_dechets"]=>
+    NULL
+    ["erp"]=>
+    string(3) "Non"
+    ["date_de_reference"]=>
+    string(10) "2021-12-31"
+  }
+}
